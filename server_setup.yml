@@ -42,10 +42,31 @@
     notify:
       - docker status
 
-  - name: Install python-pip
-    apt: 
-      name: python3-pip
+  - name: Get jenkins key
+    shell: curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+
+  - name: Add apt repository for LTS versions of jenkins
+    apt_repository:
+      repo: deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/ 
       state: present
+
+
+  - name: Install python-pip java-11
+    apt: 
+      name: "{{ packages }}"
+      state: present
+      update_cache: yes
+    vars:
+      packages:
+      - python3-pip 
+      - openjdk-11-jdk
+      
+
+  - name: Install jenkins
+    apt: 
+      name:  jenkins
+      state: present
+      update_cache: yes
 
   # Install (Docker) python package.
   - name: Install Docker python package
@@ -64,21 +85,22 @@
       daemon_reload: yes
       state: restarted 
 
-  - name: First start Jenkins in docker container
-    docker_container:
-      name: Jenkins
-      image: jenkins/jenkins
-      state: started
-      restart: yes
-      ports:
-       - "8080:8080"
-     
+  - name: Pull nginx docker image
+    docker_image:
+      name: nginx
+      source: pull
+      
   - name: Print initial jenkins password
-    shell: docker exec Jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+    shell: cat /var/lib/jenkins/secrets/initialAdminPassword
     register : jenkinspassword
 
   - debug:
       var: jenkinspassword.stdout
+
+  - name: Add jenkins user to docker group
+    user:
+      name: jenkins
+      group: docker
 
    #Setup a handler for checking Docker daemon using the below code.
   handlers:
