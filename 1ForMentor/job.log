@@ -1,0 +1,66 @@
+Started by GitHub push by SVIELCOM
+Running as SYSTEM
+Building in workspace /var/lib/jenkins/workspace/index_html
+The recommended git tool is: NONE
+No credentials specified
+ > git rev-parse --resolve-git-dir /var/lib/jenkins/workspace/index_html/.git # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url https://github.com/SVIELCOM/Pr8 # timeout=10
+Fetching upstream changes from https://github.com/SVIELCOM/Pr8
+ > git --version # timeout=10
+ > git --version # 'git version 2.17.1'
+ > git fetch --tags --progress -- https://github.com/SVIELCOM/Pr8 +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/main^{commit} # timeout=10
+Checking out Revision e336912c57eb0ce8802ebcd3751a84ff68d86c62 (refs/remotes/origin/main)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f e336912c57eb0ce8802ebcd3751a84ff68d86c62 # timeout=10
+Commit message: "all is settings is done"
+ > git rev-list --no-walk 565ed6a94df0a41acf58a4683e941f8f23da8b2f # timeout=10
+[index_html] $ /bin/sh -xe /tmp/jenkins9292197862990133469.sh
++ pwd
++ docker run -d -it --rm -p 9889:80 --name nginx -v /var/lib/jenkins/workspace/index_html/site:/var/www/html nginx_md5
+6019caa01bf994180d1983316f1ca26e78257fd7f2b3c28512f717afd28ffaf4
++ sleep 7
+HttpMethod: GET
+URL: http://51.250.5.118:9889/
+Sending request to url: http://51.250.5.118:9889/
+Response Code: HTTP/1.1 200 OK
+Response: 
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {background-color: powerblue;}
+h1   {color: rgb(20, 19, 19);}
+p    {color: red;}
+</style>
+</head>
+<body>
+
+<h1>This is a heading</h1>
+<p>This is a paragraph.</p>
+
+</body>
+</html>
+
+Success: Status code 200 is in the accepted range: 200
+[index_html] $ /bin/sh -xe /tmp/jenkins9285541797129454452.sh
++ curl+ awk BEGIN{RS="\r\n"}{if ($1=="Content-MD5-Hex:")printf "%s%s", $2, " *site/index.html" }
++ md5sum -c -
+ -I http://51.250.5.118:9889/index.html
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0   221    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+site/index.html: OK
+Performing Post build task...
+Match found for : : True
+Logical operation result is TRUE
+Running script  : docker stop nginx
+[index_html] $ /bin/sh -xe /tmp/jenkins16677647535409189013.sh
++ docker stop nginx
+nginx
+POST BUILD TASK : SUCCESS
+END OF POST BUILD TASK : 0
+Finished: SUCCESS
