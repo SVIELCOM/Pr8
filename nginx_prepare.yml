@@ -1,0 +1,37 @@
+---
+
+- hosts: master
+  become: true
+  become_user: root
+  tasks:
+  - name: copy nessesary prapared nginx config files 
+    copy:
+      src: nginx_conf
+      dest: /home/ubuntu/
+      owner: ubuntu
+      group: ubuntu
+      mode: 0644
+
+  - name: run nginx container,
+    docker_container:
+      name: nginx_prep
+      image: nginx
+      recreate: yes
+      state: started
+      detach: yes
+      volumes: 
+         - /home/ubuntu:/root
+  
+  - name: update apt cache in container, install nginx-extras, copy config files, commit docker image, delete source container and image
+    command: "{{ item }}"
+    with_items:
+     - docker exec nginx_prep apt-get update
+     - docker exec nginx_prep apt-get install nginx-extras --yes
+     - docker exec nginx_prep cp /root/nginx_conf/nginx.conf /etc/nginx/nginx.conf
+     - docker exec nginx_prep cp /root/nginx_conf/default.conf /etc/nginx/sites-available/default
+     - docker exec nginx_prep mkdir -p /usr/share/nginx/perl/lib
+     - docker exec nginx_prep cp /root/nginx_conf/ContentMD5.pm /usr/share/nginx/perl/lib/ContentMD5.pm
+     - docker commit nginx_prep nginx_md5
+     - docker stop nginx_prep
+     - docker rm nginx_prep
+     - docker rmi nginx
